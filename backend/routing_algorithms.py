@@ -5,7 +5,7 @@ import networkx
 
 
 @dataclass
-class CoreRoutingAlgorithm(ABC):
+class BaseRoutingAlgorithm(ABC):
     """This is the abstract routing algorithm class. Any routing algorithm must be defined as a child of this class."""
 
     ottawa_road_network: networkx.classes.multidigraph.MultiDiGraph
