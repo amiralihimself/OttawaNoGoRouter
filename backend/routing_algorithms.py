@@ -13,8 +13,9 @@ class BaseRoutingAlgorithm(ABC):
     """An int representing the start vertex in the corresponding road network of Ottawa"""
     destination_vertex: Union[str, None]
     """An int representing the destination vertex in the corresponding road network of Ottawa"""
-    edges_to_avoid: List[Tuple[int, int, int]]
-    """A list of edges to avoid in decreasing order of dispreference. Every edge in the road network is shown using a tuple of three integers. """
+    edges_to_avoid: List[List[Tuple[int, int, int]]]
+    """A list of edges to avoid in decreasing order of dispreference. Every edge in the road network is shown using a tuple of three integers.
+    Furthermore, every street is associated with 1 or more edge."""
     street_names_to_avoid: List[str]
     """"The name of the streets to avoid, in case they need to be reference directly in the logs by the routing algorithm(s)"""
 
