@@ -17,7 +17,7 @@ class BaseRoutingAlgorithm(ABC):
     """A list of edges to avoid in decreasing order of dispreference. Every edge in the road network is shown using a tuple of three integers.
     Furthermore, every street is associated with 1 or more edge."""
     street_names_to_avoid: List[str]
-    """"The name of the streets to avoid, in case they need to be reference directly in the logs by the routing algorithm(s)"""
+    """"The name of the streets to avoid, in case they need to be referenced directly in the logs by the routing algorithm(s)"""
 
     @abstractmethod
     def find_route(self) -> Tuple[List[Tuple[int, int, int]], str]:
