@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from typing import List, Tuple, Union
 import networkx
 
+from backend.utils import DisjointSetUnion
+
 
 @dataclass
 class BaseRoutingAlgorithm(ABC):
@@ -27,3 +29,48 @@ class BaseRoutingAlgorithm(ABC):
         avoided whatsoever.
         """
         raise NotImplementedError
+
+
+@dataclass
+class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
+
+    def find_route(self) -> Tuple[List[Tuple[int, int, int]], str]:
+        nodes = list(self.ottawa_road_network.nodes)
+        dsu = DisjointSetUnion(nodes)
+        included_edges: List[Tuple[int, int, int]] = []
+        log_messages: List[str] = []
+
+        # Process streets in the order provided by edges_to_avoid
+        for street_idx, street_edges in enumerate(self.edges_to_avoid):
+            # Temporarily add all edges of the street
+            temp_union_made = False
+            for u, v, key in street_edges:
+                if dsu.union(u, v):
+                    temp_union_made = True
+
+            # Check if source and destination are now connected
+            if self.destination_vertex is not None and dsu.find(
+                self.source_vertex
+            ) == dsu.find(self.destination_vertex):
+                # Cannot omit this street fully without disconnecting s-t
+                # Log that some streets could not be avoided
+                if temp_union_made:
+                    log_messages.append(
+                        f"Street '{self.street_names_to_avoid[street_idx]}' could not be avoided; included to maintain s-t connectivity."
+                    )
+                # All its edges must be added
+                included_edges.extend(street_edges)
+            else:
+                # Street successfully avoided
+                log_messages.append(
+                    f"Street '{self.street_names_to_avoid[street_idx]}' fully avoided."
+                )
+                # Do NOT add edges to included_edges; they are omitted
+
+        # Final check in case destination is None
+        if self.destination_vertex is None:
+            log_messages.append(
+                "Destination not specified; all processed streets handled as above."
+            )
+
+        return included_edges, "\n".join(log_messages)
