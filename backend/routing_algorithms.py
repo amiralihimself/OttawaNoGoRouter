@@ -89,7 +89,7 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
         # Need some dispreferred streets: add them back from least to most disliked 
         # edges_to_avoid / street_names_to_avoid are in decreasing dispreference:
         #   index 0 = most hated, last = least hated.
-        # We want to bring back least-disliked first, so iterate in reverse.
+        # We want to bring back least-disliked first, so we iterate in reverse.
         streets_reversed = list(
             zip(reversed(self.edges_to_avoid), reversed(self.street_names_to_avoid))
         )
