@@ -1,8 +1,30 @@
+from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 import networkx as nx
+import osmnx as ox
+
+PATH_TO_GRAPH = "backend/ottawa_drive.graphml"
 
 
-def _shortest_path_edges(
+@dataclass
+class OttawaGraphNetwork:
+    G: nx.classes.multidigraph.MultiDiGraph = field(init=False)
+
+    def __post_init__(self):
+        self.G = ox.load_graphml(PATH_TO_GRAPH)
+
+    def get_street_edges_to_avoid(
+        input_street_names: List[str],
+    ) -> Tuple[list[str], List[List[Tuple[int, int, int]]]]:
+        """Given a list of street names in sorted order of dispreference, return a tuple with two things 
+        1) The set of edge names 
+        the set of edges in Ottawa's road network corresponding to these streets, in the same order.
+        Every edge in the road network is shown using a tuple of three integers.
+        Furthermore, every street is associated with 1 or more edge."""
+        
+
+
+def shortest_path_edges(
     H: nx.MultiDiGraph, s: int, t: int, weight: str = "length"
 ) -> List[Tuple[int, int, int]]:
     """Compute shortest path from s to t in H and return it as a list of (u, v, key) edges."""
@@ -22,7 +44,7 @@ def _shortest_path_edges(
     return edges
 
 
-def _build_subgraph(
+def build_subgraph(
     G: nx.MultiDiGraph,
     allowed_edge_set: set[Tuple[int, int, int]],
 ) -> nx.MultiDiGraph:

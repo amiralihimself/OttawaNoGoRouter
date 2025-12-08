@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Tuple, Union
 import networkx
 
-from backend.utils import DisjointSetUnion, _build_subgraph, _shortest_path_edges
+from utils import DisjointSetUnion, build_subgraph, shortest_path_edges
 
 
 @dataclass
@@ -64,7 +64,7 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
             for u, v, key in street_edges:
                 avoid_edge_set.add((u, v, key))
 
-        #Union all NON-avoid edges first (neutral network)
+        # Union all NON-avoid edges first (neutral network)
         for u, v, key, data in G.edges(keys=True, data=True):
             if (u, v, key) not in avoid_edge_set:
                 dsu.union(u, v)
@@ -77,8 +77,8 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
                 for u, v, key in G.edges(keys=True)
                 if (u, v, key) not in avoid_edge_set
             }
-            H = _build_subgraph(G, allowed_edge_set)
-            path_edges = _shortest_path_edges(H, s, t)
+            H = build_subgraph(G, allowed_edge_set)
+            path_edges = shortest_path_edges(H, s, t)
 
             log = (
                 "Source and destination are connected using only non-dispreferred streets. "
@@ -86,7 +86,7 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
             )
             return path_edges, log
 
-        # Need some dispreferred streets: add them back from least to most disliked 
+        # Need some dispreferred streets: add them back from least to most disliked
         # edges_to_avoid / street_names_to_avoid are in decreasing dispreference:
         #   index 0 = most hated, last = least hated.
         # We want to bring back least-disliked first, so we iterate in reverse.
@@ -124,10 +124,10 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
                 allowed_edge_set.add((u, v, key))
 
         # Build the restricted graph and compute shortest path
-        H = _build_subgraph(G, allowed_edge_set)
-        path_edges = _shortest_path_edges(H, s, t)
+        H = build_subgraph(G, allowed_edge_set)
+        path_edges = shortest_path_edges(H, s, t)
 
-        # Build logs about what portion of the user's request was satisfied 
+        # Build logs about what portion of the user's request was satisfied
         included_set = set(included_streets)
         avoided_streets = [
             name for name in self.street_names_to_avoid if name not in included_set
