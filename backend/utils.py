@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import difflib
 from typing import Dict, List, Tuple
 import networkx as nx
 import osmnx as ox
@@ -14,14 +15,43 @@ class OttawaGraphNetwork:
         self.G = ox.load_graphml(PATH_TO_GRAPH)
 
     def get_street_edges_to_avoid(
+        self,
         input_street_names: List[str],
     ) -> Tuple[list[str], List[List[Tuple[int, int, int]]]]:
-        """Given a list of street names in sorted order of dispreference, return a tuple with two things 
-        1) The set of edge names 
-        the set of edges in Ottawa's road network corresponding to these streets, in the same order.
+        """Given a list of street names in sorted order of dispreference, return a tuple with two things
+        1) The set of edge names that were matched to these street names respectively, and
+        2) the set of edges in Ottawa's road network corresponding to these streets, in the same order.
         Every edge in the road network is shown using a tuple of three integers.
         Furthermore, every street is associated with 1 or more edge."""
-        
+
+        all_street_edges_to_avoid: List[List[Tuple[int, int, int]]] = []
+        matched_street_names_in_the_network: List[str] = []
+        for input_street_name in input_street_names:
+            input_street_name = input_street_name.lower()
+            # we use a fuzzy matching technique
+            highest_similarity_threshold = -1000
+            most_similar_street_name = "INVALID STRING"
+            input_street_edges: List[Tuple[int, int, int]] = []
+            for u, v, key, data in self.G.edges(keys=True, data=True):
+                name = data.get("name")
+                if name is None:
+                    continue
+
+                elif isinstance(name, str):
+                    name = name.lower()
+                    if name == most_similar_street_name:
+                        input_street_edges.append((u, v, key))
+                    else:
+                        matcher = difflib.SequenceMatcher(None, input_street_name, name)
+                        similarity_ratio = matcher.ratio()
+                        if similarity_ratio > highest_similarity_threshold:
+                            highest_similarity_threshold = similarity_ratio
+                            input_street_edges = [(u, v, key)]
+
+            all_street_edges_to_avoid.append(input_street_edges)
+            matched_street_names_in_the_network.append(most_similar_street_name.title())
+
+        return matched_street_names_in_the_network, all_street_edges_to_avoid
 
 
 def shortest_path_edges(
