@@ -135,7 +135,7 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
 
         log_lines = [
             f"Total dispreferred streets in request: {len(self.street_names_to_avoid)}",
-            f"Streets that could NOT be omitted (needed in some s–t connection): {included_streets if included_streets else 'None'}",
+            f"Streets that could NOT be omitted (needed in some s-t connection): {included_streets if included_streets else 'None'}",
             f"Streets successfully avoided: {avoided_streets if avoided_streets else 'None'}",
         ]
         log = "\n".join(log_lines)

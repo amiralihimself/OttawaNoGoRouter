@@ -53,6 +53,13 @@ class OttawaGraphNetwork:
 
         return matched_street_names_in_the_network, all_street_edges_to_avoid
 
+    def get_closest_vertex_to_an_ottawa_address(ottawa_address: str) -> int:
+        """Given an Ottawa address in str, return an int representing the vertex in G that corresponds to that address.
+        we first make sure the address is in the correct format,
+        and raise an exception if the address doesn't appear to be a valid address in Ottawa. 
+        """
+        raise NotImplementedError
+
 
 def shortest_path_edges(
     H: nx.MultiDiGraph, s: int, t: int, weight: str = "length"
