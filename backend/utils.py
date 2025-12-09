@@ -1,10 +1,21 @@
 from dataclasses import dataclass, field
 import difflib
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 import networkx as nx
 import osmnx as ox
 
 PATH_TO_GRAPH = "backend/ottawa_drive.graphml"
+LOCAL_CITY_NAMES = [
+    "ottawa",
+    "kanata",
+    "nepean",
+    "orleans",
+    "gloucester",
+    "vanier",
+    "manotick",
+    "greely",
+    "stittsville",
+]
 
 
 @dataclass
@@ -54,12 +65,91 @@ class OttawaGraphNetwork:
 
         return matched_street_names_in_the_network, all_street_edges_to_avoid
 
-    def get_closest_vertex_to_an_ottawa_address(ottawa_address: str) -> int:
-        """Given an Ottawa address in str, return an int representing the vertex in G that corresponds to that address.
-        we first make sure the address is in the correct format,
-        and raise an exception if the address doesn't appear to be a valid address in Ottawa.
+    def _graph_bbox(self) -> Tuple[float, float, float, float]:
+        """Return (south, north, west, east) for self.G (Ottawa's graph)"""
+        north = self.G.graph.get("north")
+        south = self.G.graph.get("south")
+        east = self.G.graph.get("east")
+        west = self.G.graph.get("west")
+
+        if None in (north, south, east, west):
+            ys = [data["y"] for _, data in self.G.nodes(data=True)]
+            xs = [data["x"] for _, data in self.G.nodes(data=True)]
+            north, south = max(ys), min(ys)
+            east, west = max(xs), min(xs)
+
+        return south, north, west, east
+
+    def _geocode_in_graph_extent(self, query: str) -> Tuple[float, float]:
         """
-        raise NotImplementedError
+        Geocode query (a str) and ensure the result is inside or near
+        the Ottawa graph bounding box. Raises ValueError otherwise.
+        """
+        try:
+            lat, lon = ox.geocode(query)
+        except Exception as e:
+            raise ValueError(f"Could not geocode query {query!r}: {e}") from e
+
+        south, north, west, east = self._graph_bbox()
+
+        # allow a bit of slack (~5km) in each direction
+        margin = 0.05
+        if not (
+            south - margin <= lat <= north + margin
+            and west - margin <= lon <= east + margin
+        ):
+            raise ValueError(
+                f"Geocoded point ({lat:.6f}, {lon:.6f}) is outside the Ottawa "
+                f"road network extent."
+            )
+
+        return lat, lon
+
+    def get_closest_vertex_to_an_ottawa_address(self, address: str) -> Tuple [int, str]:
+        """
+        Given a user-provided address string, try to interpret it as an address
+        in the Ottawa / Greater Ottawa Area and return the nearest vertex in self.G.
+
+        We do not require the user to type 'Ottawa'. We:
+          - build a list of candidate queries,
+          - geocode each,
+          - keep the first result that falls within the Ottawa graph extent.
+        The output is a Tuple[int, str]. the int represents the closest vertex in G, and a string corresponding to the address we interpreted it as.
+        """
+        
+        if not isinstance(address, str) or not address.strip():
+            raise ValueError("Address must be a non-empty string.")
+
+        base = address.strip()
+        lower = base.lower()
+
+        # Build candidate queries, in priority order.
+        candidates: List[str] = []
+
+        # If user did NOT explicitly mention a local city name, we prepend "Ottawa, ON"
+        if not any(city in lower for city in LOCAL_CITY_NAMES):
+            candidates.append(f"{base}, Ottawa, Ontario, Canada")
+
+        # Always try the raw address as well just to be safe
+        candidates.append(base)
+
+        last_error: Union[Exception, None] = None
+
+        for q in candidates:
+            try:
+                lat, lon = self._geocode_in_graph_extent(q)
+                # If we get here, point is inside (or near) the Ottawa graph extent
+                node = ox.distance.nearest_nodes(self.G, X=lon, Y=lat)
+                return node, q
+            except ValueError as e:
+                last_error = e
+                continue
+
+        # If all candidates failed:
+        raise ValueError(
+            f"Could not interpret {address!r} as an address within the Ottawa "
+            f"road network. Last error: {last_error}"
+        )
 
 
 def shortest_path_edges(
