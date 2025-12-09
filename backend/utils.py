@@ -46,6 +46,7 @@ class OttawaGraphNetwork:
                         similarity_ratio = matcher.ratio()
                         if similarity_ratio > highest_similarity_threshold:
                             highest_similarity_threshold = similarity_ratio
+                            most_similar_street_name = name
                             input_street_edges = [(u, v, key)]
 
             all_street_edges_to_avoid.append(input_street_edges)
@@ -56,7 +57,7 @@ class OttawaGraphNetwork:
     def get_closest_vertex_to_an_ottawa_address(ottawa_address: str) -> int:
         """Given an Ottawa address in str, return an int representing the vertex in G that corresponds to that address.
         we first make sure the address is in the correct format,
-        and raise an exception if the address doesn't appear to be a valid address in Ottawa. 
+        and raise an exception if the address doesn't appear to be a valid address in Ottawa.
         """
         raise NotImplementedError
 
