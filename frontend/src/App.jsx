@@ -29,10 +29,6 @@ export default function App() {
     <div style={{ minHeight: "100vh", backgroundColor: "#6fe5dbe3", padding: 24 }}>
       <div style={{ maxWidth: 700, margin: "40px auto", fontFamily: "system-ui" }}>
         <h1>OttawaNoGoRouter</h1>
-        <label>
-          <label style={{ display: "block", marginTop: 12, fontWeight: 600 }}></label>
-          salam
-        </label>
         <label style={{ display: "block", marginTop: 12, fontWeight: 600 }}>
           Start Address
         </label>
@@ -49,7 +45,7 @@ export default function App() {
         <input
           value={end}
           onChange={(e) => setEnd(e.target.value)}
-          placeholder="Example: 45.4112,-75.6981"
+          placeholder="Example: 75 Laurier Avenue East"
           style={{ width: "100%", padding: 10, boxSizing: "border-box" }}
         />
 
