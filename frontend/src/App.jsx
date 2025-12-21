@@ -13,9 +13,16 @@ export default function App() {
   }, [avoidText]);
 
   function handleRoute() {
-    const payload = { start, end, avoid: avoidList };
-    console.log("Route payload:", payload);
-    alert(`Payload printed to console.\nAvoid count: ${avoidList.length}`);
+    if ((start == "") || (end == "")) {
+      alert("Start and Destination Addresses cannot be empty, please try again.");
+
+    }
+    else {
+      const payload = { start, end, avoid: avoidList };
+      console.log("Route payload:", payload);
+      alert(`Payload printed to console.\nAvoid count: ${avoidList.length}`);
+    }
+
   }
 
   function handleClear() {
