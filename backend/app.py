@@ -17,7 +17,7 @@ def find_route():
     {
       "start": "1125 Colonel By Dr",
       "end": "75 Laurier Avenue East",
-      "avoid": ["Bronson Ave", "Nepean St"]
+      "avoid": ["Bank St", "Rideau St"]
     }
     """
     data = request.get_json(silent=True) or {}
