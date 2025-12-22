@@ -113,7 +113,6 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
                 "No path between source and destination exists in the graph."
             )
 
-        #  Build set of allowed edges for routing ---
         allowed_edge_set = set()
         for u, v, key in G.edges(keys=True):
             if (u, v, key) not in avoid_edge_set:
