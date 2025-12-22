@@ -33,7 +33,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#6fe5dbe3", padding: 24 }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#e9efe6e2", padding: 24 }}>
       <div style={{ maxWidth: 700, margin: "40px auto", fontFamily: "system-ui" }}>
         <h1>OttawaNoGoRouter</h1>
         <label style={{ display: "block", marginTop: 12, fontWeight: 600 }}>
