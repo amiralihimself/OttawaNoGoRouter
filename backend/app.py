@@ -2,10 +2,13 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pydantic import ValidationError
 
+from utils import OttawaGraphNetwork
 from schemas import RouteRequest
 
 app = Flask(__name__)
 CORS(app)
+
+OTTAWA_GRAPH_NETWORK: OttawaGraphNetwork = OttawaGraphNetwork()
 
 
 @app.get("/health")
