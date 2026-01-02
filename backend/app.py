@@ -8,7 +8,9 @@ from schemas import RouteRequest
 app = Flask(__name__)
 CORS(app)
 
-OTTAWA_GRAPH_NETWORK: OttawaGraphNetwork = OttawaGraphNetwork()
+OTTAWA_GRAPH_NETWORK: OttawaGraphNetwork = (
+    OttawaGraphNetwork()
+)  # loading up the ottawa road network
 
 
 @app.get("/health")
@@ -44,6 +46,21 @@ def find_route():
 
     start_address = payload.start_address
     destination_address = payload.destination_address
+    street_names_to_avoid = payload.avoid
+
+    source_vertex, source_address_interpretation = (
+        OTTAWA_GRAPH_NETWORK.get_closest_vertex_to_an_ottawa_address(start_address)
+    )
+    destination_vertex, destination_address_interpretation = (
+        OTTAWA_GRAPH_NETWORK.get_closest_vertex_to_an_ottawa_address(
+            destination_address
+        )
+    )
+
+    street_names_to_avoid, edges_to_avoid = (
+        OTTAWA_GRAPH_NETWORK.get_street_edges_to_avoid(street_names_to_avoid)
+    )
+
     avoid = payload.avoid
     # TODO: replace this with real routing
     # For now, return a dummy polyline to prove plumbing works.
@@ -67,7 +84,7 @@ def find_route():
         jsonify(
             {
                 "success": True,
-                "log": f"route computed (dummy) start='{start_address}' end='{destination_address}' avoid_count={len(avoid)}",
+                "log": f"route computed (dummy) start='{source_address_interpretation}' end='{destination_address_interpretation}' avoid_count={len(avoid)}",
                 "route": dummy_geojson,
             }
         ),
