@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pydantic import ValidationError
 
+from routing_algorithms import RoutingWithContinuousDeletions
 from utils import OttawaGraphNetwork
 from schemas import RouteRequest
 
@@ -13,7 +14,7 @@ OTTAWA_GRAPH_NETWORK: OttawaGraphNetwork = (
 )  # loading up the ottawa road network
 
 
-@app.get("/health")
+@app.get("/api/health")
 def health() -> dict[str, bool]:
     return {"success": True}
 
@@ -46,7 +47,7 @@ def find_route():
 
     start_address = payload.start_address
     destination_address = payload.destination_address
-    street_names_to_avoid = payload.avoid
+    avoid = payload.avoid
 
     source_vertex, source_address_interpretation = (
         OTTAWA_GRAPH_NETWORK.get_closest_vertex_to_an_ottawa_address(start_address)
@@ -58,24 +59,33 @@ def find_route():
     )
 
     street_names_to_avoid, edges_to_avoid = (
-        OTTAWA_GRAPH_NETWORK.get_street_edges_to_avoid(street_names_to_avoid)
+        OTTAWA_GRAPH_NETWORK.get_street_edges_to_avoid(avoid)
     )
 
-    avoid = payload.avoid
-    # TODO: replace this with real routing
-    # For now, return a dummy polyline to prove plumbing works.
-    dummy_geojson = {
+    # The algorithm is now instantiated
+    algorithm = RoutingWithContinuousDeletions(
+        ottawa_road_network=OTTAWA_GRAPH_NETWORK.G,
+        source_vertex=source_vertex,
+        destination_vertex=destination_vertex,
+        edges_to_avoid=edges_to_avoid,
+        street_names_to_avoid=street_names_to_avoid,
+    )
+
+    path_edges, log = algorithm.find_route()
+    path_nodes = [path_edges[0][0]] + [v for (_, v, _) in path_edges]
+    path_coords = [
+        (OTTAWA_GRAPH_NETWORK.G.nodes[n]["y"], OTTAWA_GRAPH_NETWORK.G.nodes[n]["x"])
+        for n in path_nodes
+    ]
+    geojson = {
         "type": "Feature",
         "geometry": {
             "type": "LineString",
-            "coordinates": [
-                [-75, 45],
-                [-76, 46],
-            ],
+            "coordinates": path_coords,
         },
         "properties": {
-            "start": start_address,
-            "end": destination_address,
+            "start": source_address_interpretation,
+            "end": destination_address_interpretation,
             "avoid_count": len(avoid),
         },
     }
@@ -84,8 +94,8 @@ def find_route():
         jsonify(
             {
                 "success": True,
-                "log": f"route computed (dummy) start='{source_address_interpretation}' end='{destination_address_interpretation}' avoid_count={len(avoid)}",
-                "route": dummy_geojson,
+                "log": log,
+                "route": geojson,
             }
         ),
         200,
