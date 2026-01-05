@@ -9,7 +9,6 @@ from utils import DisjointSetUnion, build_subgraph, shortest_path_edges
 @dataclass
 class BaseRoutingAlgorithm(ABC):
     """This is the abstract routing algorithm class. Any routing algorithm must be defined as a child of this class."""
-
     ottawa_road_network: networkx.classes.multidigraph.MultiDiGraph
     source_vertex: int
     """An int representing the start vertex in the corresponding road network of Ottawa"""
@@ -19,7 +18,7 @@ class BaseRoutingAlgorithm(ABC):
     """A list of edges to avoid in decreasing order of dispreference. Every edge in the road network is shown using a tuple of three integers.
     Furthermore, every street is associated with 1 or more edge."""
     street_names_to_avoid: List[str]
-    """"The name of the streets to avoid, in case they need to be referenced directly in the logs by the routing algorithm(s)"""
+    """The name of the streets to avoid, in case they need to be referenced directly in the logs by the routing algorithm(s)"""
 
     @abstractmethod
     def find_route(self) -> Tuple[List[Tuple[int, int, int]], str]:
@@ -29,6 +28,7 @@ class BaseRoutingAlgorithm(ABC):
         avoided whatsoever.
         """
         raise NotImplementedError
+
 
 
 @dataclass
@@ -54,7 +54,7 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
         G = self.ottawa_road_network
         s = self.source_vertex
         t = self.destination_vertex
-
+        
         nodes = list(G.nodes)
         dsu = DisjointSetUnion(nodes)
 
