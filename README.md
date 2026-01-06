@@ -17,6 +17,52 @@ OttawaNoGoRouter is a full-stack web app that computes a driving route while try
 - Computes a shortest path on the resulting restricted network
 - Visualizes the route on an interactive map and shows a routing log
 
+## Examples
+
+**Note on inputs.**  
+Addresses should correspond to places in Ottawa. Standard civic addresses like `296 Bank St` work perfectly. In most cases, well-known place names like `Parliament of Canada` also work, though I have seen cases where the app was unable to locate specific places using only their names.
+
+These examples are intentionally simple, but the app also supports long routes across the city.
+
+---
+
+### Example 1: Basic route (no dispreferred streets)
+
+- Start: `Parliament of Canada`
+- Destination: `296 Bank St`
+- Avoid list: *(empty)*
+
+**Result:** A route is computed and displayed on the map.
+
+<img width="1300" height="500" alt="example1" src="https://github.com/user-attachments/assets/cab51781-3345-46f8-b63c-64c196deb6bd" />
+
+---
+
+### Example 2: Avoid one street
+
+- Start: `Parliament of Canada`
+- Destination: `296 Bank St`
+- Avoid list (in decreasing order of dispreference):
+  1. `Albert St`
+
+**Result:** The computed route avoids `Albert St`, and the log reports that the requested dispreferred street was successfully avoided.
+
+<img width="1300" height="500" alt="example2" src="https://github.com/user-attachments/assets/7b871611-2af0-4f68-bdf9-e28972600fd0" />
+
+---
+
+### Example 3: Avoid two streets (ordered)
+
+- Start: `Parliament of Canada`
+- Destination: `296 Bank St`
+- Avoid list (in decreasing order of dispreference):
+  1. `Albert St` (more dispreferred)
+  2. `Queen St` (less dispreferred)
+
+**Result:** The computed route avoids both `Albert St` and `Queen St`, and the log reports that all requested dispreferred streets were successfully avoided.
+
+<img width="1300" height="500" alt="example3" src="https://github.com/user-attachments/assets/7f7944ca-b7a4-47bc-af37-4c956d7e387c" />
+
 ## Tech stack
 
 **Frontend**
