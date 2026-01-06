@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 import difflib
 from typing import Dict, List, Tuple, Union
 import networkx as nx
+from pathlib import Path
 import osmnx as ox
 
 PATH_TO_GRAPH = "backend/ottawa_drive.graphml"
@@ -23,7 +24,16 @@ class OttawaGraphNetwork:
     G: nx.classes.multidigraph.MultiDiGraph = field(init=False)
 
     def __post_init__(self):
-        self.G = ox.load_graphml(PATH_TO_GRAPH)
+        graph_path = Path(PATH_TO_GRAPH)
+        if not graph_path.exists():
+            # the graph does not exist, we will fetch it
+            self.G = ox.graph_from_place(
+                "Ottawa, Ontario, Canada", network_type="drive", simplify=True
+            )
+            ox.save_graphml(self.G, PATH_TO_GRAPH)
+
+        else:
+            self.G = ox.load_graphml(PATH_TO_GRAPH)
 
     def get_street_edges_to_avoid(
         self,
@@ -105,7 +115,7 @@ class OttawaGraphNetwork:
 
         return lat, lon
 
-    def get_closest_vertex_to_an_ottawa_address(self, address: str) -> Tuple [int, str]:
+    def get_closest_vertex_to_an_ottawa_address(self, address: str) -> Tuple[int, str]:
         """
         Given a user-provided address string, try to interpret it as an address
         in the Ottawa / Greater Ottawa Area and return the nearest vertex in self.G.
@@ -116,7 +126,7 @@ class OttawaGraphNetwork:
           - keep the first result that falls within the Ottawa graph extent.
         The output is a Tuple[int, str]. the int represents the closest vertex in G, and a string corresponding to the address we interpreted it as.
         """
-        
+
         if not isinstance(address, str) or not address.strip():
             raise ValueError("Address must be a non-empty string.")
 
