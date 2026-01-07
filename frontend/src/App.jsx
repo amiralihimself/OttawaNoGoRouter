@@ -94,8 +94,12 @@ export default function App() {
           fontFamily: "system-ui",
         }}
       >
-        <div style={{ maxWidth: 700, margin: "40px auto" }}>
-          <h1>OttawaNoGoRouter</h1>
+        <div style={{ maxWidth: "100%", margin: "2px auto" }}>
+          <img
+            src="/logo.png"
+            alt="OttawaNoGoRouter"
+            style={{ height: 200, width: "auto", display: "block", marginBottom: 16 }}
+          />
 
           <label style={{ display: "block", marginTop: 12, fontWeight: 600 }}>
             Start Address

@@ -84,7 +84,7 @@ class RoutingWithContinuousDeletions(BaseRoutingAlgorithm):
                 "Source and destination are connected using only non-dispreferred streets. "
                 "All requested streets to avoid were successfully avoided."
             )
-            return path_edges, log
+            return path_edges, log  
 
         # Need some dispreferred streets: add them back from least to most disliked
         # edges_to_avoid / street_names_to_avoid are in decreasing dispreference:
