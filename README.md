@@ -17,6 +17,34 @@ OttawaNoGoRouter is a full-stack web app that computes a driving route while try
 - Computes a shortest path on the resulting restricted network
 - Visualizes the route on an interactive map and shows a routing log
 
+## How to run
+
+### Prerequisites
+
+- **Python**: 3.10+
+- **Node.js**: 18+ (tested on v22.21.1)
+
+---
+
+## Backend (Flask)
+
+### Install backend dependencies
+From the repo root:
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+### Start the backend: 
+```bash
+python backend/app.py
+```
+
+### Start the frontend 
+```bash
+cd frontend
+npm run dev
+```
 ## Examples
 
 **Note on inputs.**  
@@ -84,8 +112,8 @@ Ottawa’s road network is modeled as a graph:
 The routing algorithm treats the user’s avoid-list as “dispreferred” streets, ordered from most dispreferred to least dispreferred.
 
 1. Convert each dispreferred street into the set of road edges that belong to that street.
-2. Build a “neutral” graph by removing all dispreferred edges. The dispreferred edges are the ones corresponding to some dispreferred street spcified by the user. 
-3. Use the Disjoint Set Union (DSU) data structire (Union-Find) to check if the start and destination are connected using only neutral edges. This data structure lets us check connecitivity in $\mathcal{O}(1)$ amortized time after adding each edge. This is a massive speed up over running a BFS on the entire graph every time.
+2. Build a “neutral” graph by removing all dispreferred edges. The dispreferred edges are the ones corresponding to some dispreferred street specified by the user. 
+3. Use the Disjoint Set Union (DSU) data structure (Union-Find) to check if the start and destination are connected using only neutral edges. This data structure lets us check connectivity in $\mathcal{O}(1)$ amortized time after adding each edge. This is a massive speed up over running a BFS on the entire graph every time.
    - If source and destination are connected, we compute a shortest path using only neutral edges and we successfully avoid all dispreferred streets.
 4. If they are not connected, we add dispreferred streets back in reverse order (least dispreferred first) until connectivity is restored. This is effectively equivalent to continuously removing the edges corresponding to dispreferred streets from most dispreferred to least preferred until we can no longer do so, i.e., we stop when source and destination become disconnected. 
 5. Compute a shortest path on the restricted graph containing:
