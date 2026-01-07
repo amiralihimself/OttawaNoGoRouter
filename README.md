@@ -75,7 +75,7 @@ These examples are intentionally simple, but the app also supports long routes a
 - NetworkX for graph representation and graph operations
 - OpenStreetMap-based road network data (loaded into a graph)
 
-## How the routing works (high level)
+## The Routing Algorithm (high level)
 
 Ottawa’s road network is modeled as a graph:
 - Intersections are nodes
@@ -85,7 +85,7 @@ The routing algorithm treats the user’s avoid-list as “dispreferred” stree
 
 1. Convert each dispreferred street into the set of road edges that belong to that street.
 2. Build a “neutral” graph by removing all dispreferred edges.
-3. Use Disjoint Set Union (Union-Find) to check if the start and destination are connected using only neutral edges.
+3. Use the Disjoint Set Union (DSU) data structire (Union-Find) to check if the start and destination are connected using only neutral edges. This data structure lets us check connecitivity in $O(N)$
    - If they are connected, we compute a shortest path using only neutral edges and we successfully avoid all dispreferred streets.
 4. If they are not connected, we add dispreferred streets back in reverse order (least dispreferred first) until connectivity is restored.
 5. Compute a shortest path on the restricted graph containing:
@@ -107,7 +107,7 @@ Example request:
 
 ```json
 {
-  "start_address": "START ADDRESS",
-  "destination_address": "END ADDRESS",
+  "start_address": "Parliament of Canada",
+  "destination_address": "296 Bank St",
   "avoid": ["Bank St"]
 }
