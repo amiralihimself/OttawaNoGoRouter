@@ -4,7 +4,7 @@
 
 After living in Ottawa for a few years, I have grown to love the city. At the same time, there are a few streets I personally try to avoid when driving, depending on traffic, construction, or just preference. To my surprise, most existing route planning apps do not let you say “avoid these specific streets” in a flexible way. OttawaNoGoRouter is my attempt to build that feature.
 
-OttawaNoGoRouter is a full-stack web app that computes a driving route while trying to avoid user-provided streets as much as possible. You provide a start address, a destination address, and a list of streets you would like to avoid in **decreasing order of dispreference** (most dispreferred first). The router avoids as many as it can, and if avoiding everything is not feasible, it relaxes the constraints gradually until a route becomes possible. The app also returns a short routing log explaining what happened.
+OttawaNoGoRouter is a full-stack web app that computes a driving route while trying to avoid user-provided streets as much as possible. You provide a start address, a destination address, and a list of streets you would like to avoid in **decreasing order of avoidance priority** (most dispreferred first). The router avoids as many as it can, and if avoiding everything is not feasible, it relaxes the constraints gradually until a route becomes possible. The app also returns a short routing log explaining what happened.
 
 ## What the app does
 
